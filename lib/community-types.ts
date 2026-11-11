@@ -1,0 +1,1 @@
+export type Content={id:string;kind:'advisor'|'leader'|'project'|'update'|'album';title:string;summary:string;details:string;image:string|null;role?:string;contact_url?:string;year:number|null;phase:string;status:string;owner_id:string|null;created:string;updated:string};

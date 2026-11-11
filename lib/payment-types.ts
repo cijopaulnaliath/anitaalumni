@@ -1,0 +1,2 @@
+export type Payment = {id:string;purpose:'membership'|'donation';membership_key:string|null;member_id:string|null;name:string;email:string;amount:number;currency:string;mode:'test'|'live';refunded_amount?:number;named:number;show_amount:number;status:string;order_id:string|null;payment_id:string|null;lease_until:number|null;created:string;paid_at:string|null};
+export type ProviderPayment={id:string;order_id:string;amount:number;currency:string;status:string;amount_refunded?:number};

@@ -1,0 +1,16 @@
+import type {Payment} from '@/lib/payment-types';
+function config(){const url=process.env.SUPABASE_URL,key=process.env.SUPABASE_SERVICE_ROLE_KEY;if(!url||!key)throw Error('Supabase environment variables are missing');return{url:url.replace(/\/$/,''),key};}
+async function call(path:string,init:RequestInit={}){const{url,key}=config();const r=await fetch(url+'/rest/v1/'+path,{...init,cache:'no-store',headers:{apikey:key,Authorization:`Bearer ${key}`,'Content-Type':'application/json',...init.headers}});if(!r.ok)throw Error(await r.text());return r;}
+async function rows(query:string){return await(await call('payments?'+query)).json() as Payment[];}
+export async function getPayment(id:string){return(await rows('select=*&id=eq.'+encodeURIComponent(id)))[0]||null;}
+export async function getPaymentByOrder(id:string){return(await rows('select=*&order_id=eq.'+encodeURIComponent(id)))[0]||null;}
+export async function getMembership(key:string){return(await rows('select=*&membership_key=eq.'+encodeURIComponent(key)))[0]||null;}
+export async function getPaymentMember(hash:string){return (await(await call('members?select=id,name,email,enrollment,verification,email_verified_at&archived_at=is.null&is_test=eq.0&token_hash=eq.'+encodeURIComponent(hash)+'&or=(token_expires_at.is.null,token_expires_at.gt.'+Date.now()+')')).json() as {id:string;name:string;email:string;enrollment:string|null;verification:string|null;email_verified_at:string|null}[])[0]||null;}
+export async function reservePayment(p:Payment){await call('payments?on_conflict='+(p.membership_key?'membership_key':'id'),{method:'POST',headers:{Prefer:'resolution=ignore-duplicates,return=minimal'},body:JSON.stringify(p)});return p.membership_key?getMembership(p.membership_key):getPayment(p.id);}
+export async function claimOrder(id:string){const now=Date.now();const r=await call('payments?id=eq.'+encodeURIComponent(id)+'&order_id=is.null&or=(lease_until.is.null,lease_until.lt.'+now+')',{method:'PATCH',headers:{Prefer:'return=representation'},body:JSON.stringify({lease_until:now+60000})});return(await r.json() as unknown[]).length>0;}
+export async function attachOrder(id:string,orderId:string){await call('payments?id=eq.'+encodeURIComponent(id)+'&order_id=is.null',{method:'PATCH',body:JSON.stringify({order_id:orderId,lease_until:null})});}
+export async function releaseOrder(id:string){await call('payments?id=eq.'+encodeURIComponent(id)+'&order_id=is.null',{method:'PATCH',body:JSON.stringify({lease_until:null})});}
+export async function updatePayment(id:string,status:string,paymentId:string,refundedAmount=0){await call('rpc/record_alumni_payment',{method:'POST',body:JSON.stringify({transaction_id:id,new_status:status,provider_payment_id:paymentId,refunded_value:refundedAmount})});}
+export async function donorWall(){return(await(await call('payments?select=name,amount,currency,paid_at,named,show_amount&purpose=eq.donation&status=eq.paid&mode=eq.live&order=paid_at.desc&limit=60')).json() as (Payment&{show_amount:number})[]).map(p=>({name:p.named?p.name:'Anonymous supporter',amount:p.show_amount?p.amount:null,currency:p.currency,paid_at:p.paid_at}));}
+
+export async function memberPayments(email:string){return await rows('email=eq.'+encodeURIComponent(email)+'&order=created.desc&limit=50');}

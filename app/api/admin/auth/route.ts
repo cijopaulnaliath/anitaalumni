@@ -1,0 +1,9 @@
+import {adminUser} from '@/lib/admin-auth';
+import {configuredPassword,staffSession,credentialLogin,changePassword,adminToken} from '@/lib/admin-credentials';
+import {revokeSession} from '@/lib/admin-store';
+import {reply,sameOrigin,digest} from '@/lib/payments';
+export const dynamic='force-dynamic';
+function sessionResponse(token:string){return new Response(JSON.stringify({ok:true}),{headers:{'Content-Type':'application/json','Cache-Control':'no-store','Set-Cookie':`anita_staff=${token}; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=28800`}});}
+export async function GET(r:Request){try{const [user,session,password]=await Promise.all([adminUser(r),staffSession(r),configuredPassword()]);return reply({authenticated:!!user,mustChange:!!session&&!!password?.mustChange,credentialsConfigured:!!password});}catch{return reply({authenticated:false,mustChange:false,credentialsConfigured:false});}}
+export async function POST(r:Request){if(!sameOrigin(r))return reply({error:'Sign in from this website.'},403);if(Number(r.headers.get('content-length')||0)>4096)return reply({error:'Request too large.'},413);try{const b=await r.json() as {action?:string;username?:string;password?:string};if(b.action==='change_password')return sessionResponse(await changePassword(r,String(b.password||'')));if(b.action!=='login')return reply({error:'Unknown action.'},400);return sessionResponse(await credentialLogin(String(b.username||'').trim().toLowerCase(),String(b.password||''),r));}catch(e){return reply({error:(e as Error).message||'Unable to sign in.'},401);}}
+export async function DELETE(r:Request){if(!sameOrigin(r))return reply({error:'Invalid request.'},403);const token=adminToken(r);if(token)await revokeSession(await digest(token));return new Response(JSON.stringify({ok:true}),{headers:{'Content-Type':'application/json','Cache-Control':'no-store','Set-Cookie':'anita_staff=; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=0'}});}

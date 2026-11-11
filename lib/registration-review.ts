@@ -1,0 +1,1 @@
+export function reviewIssue(method:string,note:string){if(!['school_record','batch_leader'].includes(method))return 'Choose School record or Known batch leader as the trusted source.';if(note.trim().length<10)return 'Add a review note of at least 10 characters describing how the name, batch, and class were confirmed.';return null;}

@@ -1,0 +1,6 @@
+import {reply,validHmac,provider,reconcile} from '@/lib/payments';
+import {paymentEnv} from '@/lib/payment-config';
+import {getPaymentByOrder} from '@/lib/payment-storage';
+import type {ProviderPayment} from '@/lib/payment-types';
+export const dynamic='force-dynamic';
+export async function POST(r:Request){const secret=paymentEnv().RAZORPAY_WEBHOOK_SECRET;if(!secret)return reply({error:'Webhook not configured.'},503);if(Number(r.headers.get('content-length')||0)>65536)return reply({error:'Payload too large.'},413);const raw=await r.text();if(raw.length>65536||!await validHmac(raw,r.headers.get('x-razorpay-signature')||'',secret))return reply({error:'Invalid webhook signature.'},400);try{const event=JSON.parse(raw);if(!['payment.captured','payment.failed','refund.processed','order.paid'].includes(event.event))return reply({ok:true});const id=event.payload?.payment?.entity?.id||event.payload?.refund?.entity?.payment_id;if(!/^pay_[a-zA-Z0-9]+$/.test(id||''))return reply({ok:true});const pay=await provider<ProviderPayment>('payments/'+id);const p=await getPaymentByOrder(pay.order_id);if(p)await reconcile(p,pay);return reply({ok:true});}catch{return reply({error:'Unable to process notification. Retry delivery.'},500);}}
