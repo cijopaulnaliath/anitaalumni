@@ -10,7 +10,7 @@ export async function addMember(m:Record<string,unknown>,proof:{id:string;sessio
 
 export async function deletePhoto(key:string){await call('/storage/v1/object/alumni-photos/'+key,{method:'DELETE'});}
 export async function removeMember(hash:string){const m=(await rows('select=id,photo&token_hash=eq.'+encodeURIComponent(hash)))[0];if(!m)return false;await emailRpc('remove_alumni_account',{token_value:hash});if(m.photo)await deletePhoto(String(m.photo));return true;}
-export async function putPhoto(key:string,data:ArrayBuffer,type:string){await call('/storage/v1/object/alumni-photos/'+key,{method:'POST',headers:{'Content-Type':type},body:data});}
+export async function putPhoto(key:string,data:ArrayBuffer,type:string){await call('/storage/v1/object/alumni-photos/'+key,{method:'POST',headers:{'Content-Type':type,'x-upsert':'true'},body:data});}
 export async function readPhoto(id:string,tokenHash=""){if(tokenHash&&!await ownMember(tokenHash))tokenHash='';const m=(await rows('select=photo&id=eq.'+encodeURIComponent(id)+'&or=(and(archived_at.is.null,is_test.eq.0,visible.eq.1,verification.eq.approved,email_verified_at.not.is.null),token_hash.eq.'+encodeURIComponent(tokenHash||'no_owner')+')'))[0];if(!m?.photo)return null;const r=await call('/storage/v1/object/authenticated/alumni-photos/'+m.photo);return{body:r.body,type:r.headers.get('content-type')||'image/jpeg'};}
 
 export async function setMemberPhoto(hash:string,key:string|null){await call('/rest/v1/members?token_hash=eq.'+encodeURIComponent(hash),{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({photo:key})});}
