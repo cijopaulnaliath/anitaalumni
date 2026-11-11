@@ -6,7 +6,7 @@ export default function ProfileIndicator(){
  const[member,setMember]=useState<HeaderMember|null>(null),[imageFailed,setImageFailed]=useState(false),[version,setVersion]=useState(0);
  useEffect(()=>{
   let active=true;let request=0;const controller=new AbortController();
-  async function refresh(){const current=++request;try{const r=await fetch('/api/account/session',{cache:'no-store',signal:controller.signal});if(!r.ok)return;const d=await r.json() as {member:HeaderMember|null};if(active&&current===request){setMember(d.member);setImageFailed(false);setVersion(Date.now())}}catch{}}
+  async function refresh(){const current=++request;try{const r=await fetch('/api/account/session',{cache:'no-store',signal:controller.signal});if(!r.ok)return;const d=await r.json() as {member:HeaderMember|null};if(active&&current===request){document.documentElement.dataset.memberSignedIn=d.member?'true':'false';setMember(d.member);setImageFailed(false);setVersion(Date.now())}}catch{}}
   const visible=()=>{if(document.visibilityState==='visible')void refresh()};
   void refresh();window.addEventListener('anita-account-changed',refresh);window.addEventListener('focus',refresh);document.addEventListener('visibilitychange',visible);const timer=window.setInterval(visible,60000);
   return()=>{active=false;controller.abort();window.clearInterval(timer);window.removeEventListener('anita-account-changed',refresh);window.removeEventListener('focus',refresh);document.removeEventListener('visibilitychange',visible)};

@@ -6,3 +6,5 @@
 .header-profile-status{position:absolute;right:-1px;bottom:0;width:13px;height:13px;background:#236343;border:2px solid var(--cream);border-radius:50%}
 .header-actions:has(.header-profile) .header-join{display:none}
 @media(max-width:1050px){.community-header{gap:10px}.header-actions{gap:8px;margin-left:auto}.header-actions .menu-toggle{width:44px;height:44px;align-items:center;justify-content:center;padding:8px}.community-header .brand{min-width:0}}
+
+html[data-member-signed-in="true"] a[href="/register"],html[data-member-signed-in="true"] [data-registration]{display:none!important}

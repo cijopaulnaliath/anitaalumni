@@ -1,3 +1,4 @@
+import {initiatePaytm} from '@/lib/paytm';
 import {paymentReadiness} from '@/lib/payment-readiness';
 import {settings,requestMember,digest,sameOrigin,reply,provider,publicPayment,refreshPayment} from '@/lib/payments';
 import * as store from '@/lib/payment-storage';
@@ -14,6 +15,11 @@ export async function POST(r:Request){if(!sameOrigin(r))return reply({error:'Ple
  if(p.order_id)p=await refreshPayment(p);
  if(p.status==='paid')return reply({alreadyPaid:true,payment:publicPayment(p)});
  if(p.status==='refunded')return reply({error:'This payment was refunded. Please contact the association before making another membership payment.'},409);
+ if(s.provider==='paytm'){
+ if(p.order_id&&!p.order_id.startsWith('ANITA_'))return reply({error:'An existing payment uses another provider. Contact the association before paying again.'},409);
+ if(!p.order_id){if(!await store.claimOrder(p.id))return reply({error:'Checkout is being prepared. Please wait and retry.'},409);claimed=p.id;await store.attachOrder(p.id,'ANITA_'+p.id.replaceAll('-',''));claimed='';p=(await store.getPayment(p.id))!;}
+ return reply(await initiatePaytm(p));
+ }
  if(!p.order_id){if(!await store.claimOrder(p.id))return reply({error:'Checkout is already being prepared. Please wait a moment and try again.'},409);claimed=p.id;const order=await provider<{id:string;amount:number;currency:string}>('orders',{amount:p.amount,currency:p.currency,receipt:p.id,notes:{purpose:p.purpose,transaction_id:p.id}});if(order.amount!==p.amount||order.currency!==p.currency||!/^order_[a-zA-Z0-9]+$/.test(order.id))throw Error('Unable to prepare checkout. Please try again.');await store.attachOrder(p.id,order.id);claimed='';p=(await store.getPayment(p.id))!;}
  return reply({key:s.key,mode:s.mode,orderId:p.order_id,amount:p.amount,currency:p.currency,transactionId:p.id,prefill:{name:p.name,email:p.email},purpose:p.purpose});
  }catch{if(claimed)await store.releaseOrder(claimed).catch(()=>{});return reply({error:'Unable to prepare checkout. Please try again.'},502);}}

@@ -1,0 +1,1 @@
+declare module 'paytmchecksum'{const checksum:{generateSignature(value:string|Record<string,string>,key:string):Promise<string>;verifySignature(value:string|Record<string,string>,key:string,signature:string):boolean};export default checksum;}
