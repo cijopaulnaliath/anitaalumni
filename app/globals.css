@@ -317,3 +317,20 @@ dialog{max-height:calc(100vh - 32px);max-height:calc(100dvh - 32px);max-height:c
 .alumni-directory-page .community-card>a{display:block;background:#eef0e8}
 .alumni-directory-page .community-card>a>img{display:block;width:100%;height:clamp(250px,24vw,320px);object-fit:contain;object-position:center;padding:12px}
 .member-photo img{object-fit:contain;object-position:center;padding:8px}
+
+/* School identity sits directly below the complete header lockup. */
+.community-header{height:auto;min-height:122px;padding-top:10px;padding-bottom:10px}
+.community-header .brand{position:relative;padding-bottom:34px}
+.brand-school{position:absolute;left:0;bottom:0;width:100%;font:600 10px/1.5 var(--sans);letter-spacing:1px;text-transform:uppercase;color:#52674c}
+.brand-school>span{display:block;font-weight:400;letter-spacing:.5px}
+/* Dark green editorial story card, with clear captions below each photograph. */
+.hero .school-slideshow{background:#173f35;border-color:#385b4d;overflow:hidden}
+.school-slideshow .school-slides-viewport{background:#12362e}
+.school-slideshow .school-photo-caption{background:#173f35;color:#fffef5}
+.school-slideshow .school-photo-caption h2{color:#fffef5}
+.school-slideshow .school-photo-heading small{color:#e5cd91}
+.school-slideshow .school-photo-heading>span,.school-slideshow .school-photo-caption p{color:#dce6d8}
+.school-slideshow .school-photo-credit{background:#12362e;border-top-color:#446153;color:#d3dfcc}
+.school-slideshow .school-photo-credit a{color:#f1dfb2}
+@media(max-width:1050px){.community-header{min-height:112px}.community-header nav{top:100%}.community-header nav.open{max-height:calc(100dvh - 148px)}.brand-school{font-size:10px;letter-spacing:.5px}}
+@media(max-width:380px){.community-header .brand-symbol{width:48px;height:44px}.community-header .brand-symbol img{width:93px;height:93px;left:-22px;top:-11.4px}.community-header .brand-wordmark strong{font-size:15px!important;letter-spacing:.5px}.community-header .brand-wordmark small{font-size:8px;letter-spacing:1px}.brand-school{font-size:10px}}
