@@ -1,0 +1,13 @@
+.registration-content .registration-photo-picker{padding:20px;border:1px solid #c9d6bd;border-radius:6px;background:#edf1e5;margin:24px 0}
+.registration-photo-picker>legend{font-size:18px;font-weight:600;padding:0 6px}
+.registration-photo-picker>legend .optional-label{display:inline;margin-left:8px;font-size:14px;font-weight:400}
+.registration-photo-picker>p{font-size:16px;line-height:1.6;margin-bottom:16px}
+.registration-photo-actions{display:flex;flex-wrap:wrap;gap:12px;margin:16px 0}
+.registration-photo-actions .btn{gap:9px;min-height:48px}
+.registration-photo-selection{display:flex;align-items:center;gap:16px;margin-top:18px;min-width:0}
+.registration-photo-selection>img{width:88px;height:104px;object-fit:contain;border-radius:5px;background:#fffef8;flex:none}
+.registration-photo-selection p{font-size:16px;margin:0 0 8px}
+.registration-camera{margin-top:18px;padding:16px;border:1px solid #b9c9ae;border-radius:6px;background:#fffef8}
+.registration-camera video{display:block;width:100%;max-height:360px;aspect-ratio:4/3;object-fit:contain;background:#12362e;border-radius:4px}
+.registration-camera p{font-size:16px;margin-top:12px}
+@media(max-width:600px){.registration-photo-actions{flex-direction:column}.registration-photo-actions .btn{width:100%}.registration-content .registration-photo-picker{padding:16px}.registration-camera{padding:12px}}
