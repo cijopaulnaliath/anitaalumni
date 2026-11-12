@@ -337,3 +337,17 @@ dialog{max-height:calc(100vh - 32px);max-height:calc(100dvh - 32px);max-height:c
 
 .community-header .brand-school{width:max-content;white-space:nowrap;font-size:9px;letter-spacing:.3px}
 .community-header .brand{padding-bottom:20px}
+
+/* Keep portrait content inside its frame and names in normal card flow. */
+.member-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+.member-card{min-width:0;display:flex;flex-direction:column;align-items:stretch}
+.member-photo{flex:none;min-width:0;overflow:hidden}
+.member-photo img{position:absolute;inset:0;display:block;min-width:0;min-height:0;max-width:100%;max-height:100%;width:100%;height:100%;object-fit:contain}
+.member-info{min-width:0;position:relative}
+.member-info h3{align-items:flex-start;gap:10px;line-height:1.25;white-space:normal}
+.member-name{display:block;min-width:0;flex:1;overflow-wrap:anywhere;word-break:normal}
+.member-info h3>svg,.member-info small>svg{flex-shrink:0}
+.member-info small{align-items:flex-start}
+@media(max-width:1100px){.member-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:760px){.member-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.member-info h3{font-size:24px}}
+@media(max-width:600px){.member-grid{grid-template-columns:minmax(0,1fr);gap:20px}.member-photo{height:300px}.member-info{padding:20px}.member-info h3{font-size:27px}.member-info p,.member-info small{font-size:16px}}
