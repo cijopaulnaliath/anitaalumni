@@ -334,3 +334,6 @@ dialog{max-height:calc(100vh - 32px);max-height:calc(100dvh - 32px);max-height:c
 .school-slideshow .school-photo-credit a{color:#f1dfb2}
 @media(max-width:1050px){.community-header{min-height:112px}.community-header nav{top:100%}.community-header nav.open{max-height:calc(100dvh - 148px)}.brand-school{font-size:10px;letter-spacing:.5px}}
 @media(max-width:380px){.community-header .brand-symbol{width:48px;height:44px}.community-header .brand-symbol img{width:93px;height:93px;left:-22px;top:-11.4px}.community-header .brand-wordmark strong{font-size:15px!important;letter-spacing:.5px}.community-header .brand-wordmark small{font-size:8px;letter-spacing:1px}.brand-school{font-size:10px}}
+
+.community-header .brand-school{width:max-content;white-space:nowrap;font-size:9px;letter-spacing:.3px}
+.community-header .brand{padding-bottom:20px}
