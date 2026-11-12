@@ -23,6 +23,6 @@ export default function SchoolSlideshow(){
   </div>
   <div className="school-photo-caption" aria-live={rotating?'off':'polite'} aria-atomic="true"><div className="school-photo-heading"><small>{slide.label}</small><span>Thannipuzha · Kalady · Kerala</span></div><h2>{slide.title[0]}<br/>{slide.title[1]}</h2><p>{slide.caption}</p></div>
   <button type="button" className="slideshow-keyboard-pause sr-only" onClick={()=>{setPlaying(v=>!v);setFocusPaused(false)}}>{playing?'Pause slideshow':'Play slideshow'}</button>
-  <div className="school-photo-credit"><span>A glimpse of the place we call home.</span><a href="https://anitavidyalayahss.com/">Photos: our school <ArrowUpRight size={12}/></a></div>
+  <div className="school-photo-credit"><span>A glimpse of the place we call home.</span><a href="https://anitavidyalayahss.com/" target="_blank" rel="noopener noreferrer" title="Opens in a new tab">Photos: our school <ArrowUpRight size={12}/></a></div>
  </section>
 }
