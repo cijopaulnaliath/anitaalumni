@@ -3,7 +3,7 @@ import {useEffect,useState} from 'react';
 import {ArrowUpRight} from 'lucide-react';
 
 const slides=[
- {src:'/school/slides/classroom-wing.webp',alt:'The classroom wing and courtyard at Anita Vidyalaya Higher Secondary School',label:'OUR CAMPUS. OUR ROOTS.',title:['The place where','our stories began.'],caption:'Familiar corridors. A lifetime of memories.'},
+ {src:'/school/slides/classroom-wing-grey.webp',alt:'The classroom wing and courtyard at Anita Vidyalaya Higher Secondary School',label:'OUR CAMPUS. OUR ROOTS.',title:['The place where','our stories began.'],caption:'Familiar corridors. A lifetime of memories.'},
  {src:'/school/slides/students-and-teachers.webp',alt:'Students and teachers gathered for a class photograph at Anita Vidyalaya HSS',label:'OUR SCHOOL. OUR STORY.',title:['A place in our hearts.','A part of who we are.'],caption:'The years pass. The bond stays.'},
  {src:'/school/slides/school-celebration.webp',alt:'Students performing together on an outdoor stage at the school',label:'TALENT. TOGETHERNESS.',title:['Where confidence','found its stage.'],caption:'The moments that brought us together.'},
  {src:'/school/slides/student-achievements.webp',alt:'Anita Vidyalaya students with certificates and a trophy at a school gathering',label:'LEARNING. GROWING.',title:['Small beginnings.','Shared achievements.'],caption:'Every step forward becomes part of our story.'},
