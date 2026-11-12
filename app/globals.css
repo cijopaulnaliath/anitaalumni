@@ -312,3 +312,8 @@ dialog{max-height:calc(100vh - 32px);max-height:calc(100dvh - 32px);max-height:c
 
 /* Automatic school photographs; the pause action is available on keyboard focus. */
 .school-slideshow .slideshow-keyboard-pause:focus-visible{position:static;width:auto;height:auto;clip:auto;clip-path:none;white-space:normal;overflow:visible;margin:0 24px 16px;padding:10px 16px;border:1px solid var(--gold);border-radius:4px;background:var(--cream);color:var(--green)}
+
+/* Preserve the entire alumni portrait instead of cropping to fill a card. */
+.alumni-directory-page .community-card>a{display:block;background:#eef0e8}
+.alumni-directory-page .community-card>a>img{display:block;width:100%;height:clamp(250px,24vw,320px);object-fit:contain;object-position:center;padding:12px}
+.member-photo img{object-fit:contain;object-position:center;padding:8px}
