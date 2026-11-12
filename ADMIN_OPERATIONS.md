@@ -19,3 +19,13 @@ Set `EMAIL_TEST_MODE=true` to allow code `1234` for any valid email address, sol
 ## Runtime setup
 
 Set `ADMIN_LOGIN_USER` and server-only secret `ADMIN_PASSWORD_HASH` in the runtime environment. Hash format is `pbkdf2$100000$<salt>$<64 lowercase hex characters>` using PBKDF2-SHA256 with the salt encoded as UTF-8. Never commit a plaintext password or runtime secrets. Deploy after changing runtime variables. The first login must replace the temporary password. Vercel uses the generated Supabase schema and adapters; apply `supabase.sql` and keep the service-role key server-only. Payment processing still requires the Razorpay configuration documented separately.
+
+## Automatic association notifications
+
+Contact enquiries are saved in Contact inbox and forwarded to anitavidyalaya.alumni@gmail.com through the existing verified EMAIL_FROM sender. The enquirer's address is used as Reply-To.
+
+Each successful live registration sends a separate notification to every valid, unique email in the server-only ADMIN_EMAILS allowlist. The notice contains name, batch, last class, location and email, with a link to /admin for review. Test registrations do not send admin notifications. The member welcome letter remains separate.
+
+Requires existing Resend configuration. Changing ADMIN_EMAILS requires redeployment. No database migration is needed. Provider acceptance and failures are recorded in the administration audit log as notification.contact.* or notification.registration.*. A provider-accepted email is not proof of inbox delivery; check Resend delivery/bounce logs. Notifications use idempotency keys; no automatic retry or historical backfill is scheduled. Contact enquiries and registrations remain saved if notification sending fails.
+
+Regression check: node tests/association-notifications.cjs. Tests use mocked email requests and fictional records; they send no real email.
