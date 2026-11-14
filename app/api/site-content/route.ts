@@ -1,0 +1,10 @@
+import {adminUser} from '@/lib/admin-auth';
+import {audit} from '@/lib/admin-store';
+import {reply,sameOrigin} from '@/lib/payments';
+import {publicSiteContent,saveSiteContent} from '@/lib/site-content-store';
+import {siteContentField} from '@/lib/site-content-fields';
+import {validatePhoto} from '@/lib/profile-photo';
+import {putPhoto} from '@/lib/storage';
+export const dynamic='force-dynamic';
+export async function GET(){try{return reply({values:await publicSiteContent()});}catch{return reply({error:'Site content is temporarily unavailable.'},503);}}
+export async function POST(r:Request){if(!sameOrigin(r))return reply({error:'Use this website.'},403);const user=await adminUser(r);if(!user)return reply({error:'Administrator access required.'},403);if(Number(r.headers.get('content-length')||0)>4*1024*1024)return reply({error:'Choose a photo under 3 MB.'},413);try{const multipart=r.headers.get('content-type')?.includes('multipart/form-data'),f=multipart?await r.formData():null,b=f?null:await r.json() as {key?:unknown;action?:unknown;value?:unknown},key=String(f?.get('key')||b?.key||''),action=String(f?.get('action')||b?.action||''),field=siteContentField(key);if(!field||!['publish','reset'].includes(action))return reply({error:'Choose an editable field and action.'},400);if(action==='reset')await saveSiteContent(key,null);else if(field.kind==='image'){const file=f?.get('photo');if(!(file instanceof File))return reply({error:'Choose a JPG, PNG, or WebP photo.'},400);const{data,type}=await validatePhoto(file),image='site-content/'+crypto.randomUUID();await putPhoto(image,data,type);await saveSiteContent(key,null,image);}else{const value=b?.value;if(typeof value!=='string'||!value.trim()||value.length>5000)return reply({error:'Enter between 1 and 5,000 characters.'},400);await saveSiteContent(key,value.trim());}await audit(user.email,'site_content.'+action,key,'Public site content updated.');return reply({ok:true});}catch{return reply({error:'Unable to save this content. Refresh and try again.'},400);}}

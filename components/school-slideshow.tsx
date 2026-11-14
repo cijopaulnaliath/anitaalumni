@@ -1,4 +1,5 @@
 'use client';
+import {SiteText,useSiteImage} from './site-content';
 import {useEffect,useState} from 'react';
 import {ArrowUpRight} from 'lucide-react';
 
@@ -16,12 +17,12 @@ export default function SchoolSlideshow(){
  const rotating=playing&&!hovered&&!focusPaused&&visible;
  useEffect(()=>{if(!rotating)return;const timer=window.setInterval(()=>setActive(i=>(i+1)%slides.length),6500);return()=>window.clearInterval(timer)},[rotating,active]);
  function choose(index:number){setActive((index+slides.length)%slides.length);setPlaying(false)}
- const slide=slides[active];
+ const slide=slides[active];const image=useSiteImage();
  return <section className="hero-visual school-slideshow" aria-label="Photographs from our school" aria-roledescription="carousel" onMouseEnter={()=>setHovered(true)} onMouseLeave={()=>setHovered(false)} onFocusCapture={()=>setFocusPaused(true)} onBlurCapture={e=>{if(!e.currentTarget.contains(e.relatedTarget as Node|null))setFocusPaused(false)}} onKeyDown={e=>{if(e.key==='ArrowRight'){e.preventDefault();choose(active+1)}if(e.key==='ArrowLeft'){e.preventDefault();choose(active-1)}}}>
   <div className="school-slides-viewport">
-   {slides.map((item,i)=><div key={item.src} className={'school-slide'+(active===i?' is-active':'')} aria-hidden={active!==i} role="group" aria-roledescription="slide" aria-label={`${i+1} of ${slides.length}`}><img src={item.src} alt={active===i?item.alt:''} width={1349} height={500} loading={i===0?'eager':'lazy'} decoding="async" fetchPriority={i===0?'high':'auto'}/></div>)}
+   {slides.map((item,i)=><div key={item.src} className={'school-slide'+(active===i?' is-active':'')} aria-hidden={active!==i} role="group" aria-roledescription="slide" aria-label={`${i+1} of ${slides.length}`}><img src={image(`school.${i}.src`,item.src)} alt={active===i?image.text(`school.${i}.alt`,item.alt):''} width={1349} height={500} loading={i===0?'eager':'lazy'} decoding="async" fetchPriority={i===0?'high':'auto'}/></div>)}
   </div>
-  <div className="school-photo-caption" aria-live={rotating?'off':'polite'} aria-atomic="true"><div className="school-photo-heading"><small>{slide.label}</small><span>Thannipuzha · Kalady · Kerala</span></div><h2>{slide.title[0]}<br/>{slide.title[1]}</h2><p>{slide.caption}</p></div>
+  <div className="school-photo-caption" aria-live={rotating?'off':'polite'} aria-atomic="true"><div className="school-photo-heading"><small><SiteText id={`school.${active}.label`}>{slide.label}</SiteText></small><span>Thannipuzha · Kalady · Kerala</span></div><h2><SiteText id={`school.${active}.title`}>{slide.title[0]}<br/>{slide.title[1]}</SiteText></h2><p><SiteText id={`school.${active}.caption`}>{slide.caption}</SiteText></p></div>
   <button type="button" className="slideshow-keyboard-pause sr-only" onClick={()=>{setPlaying(v=>!v);setFocusPaused(false)}}>{playing?'Pause slideshow':'Play slideshow'}</button>
   <div className="school-photo-credit"><span>A glimpse of the place we call home.</span><a href="https://anitavidyalayahss.com/" target="_blank" rel="noopener noreferrer" title="Opens in a new tab">Photos: our school <ArrowUpRight size={12}/></a></div>
  </section>

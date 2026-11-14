@@ -354,3 +354,5 @@ dialog{max-height:calc(100vh - 32px);max-height:calc(100dvh - 32px);max-height:c
 
 .batch-leader-controls{margin-top:24px;padding-top:20px;border-top:1px solid var(--line)}
 .batch-leader-controls h3{font-size:22px;margin:0 0 12px}.batch-leader-controls p{max-width:65ch}
+
+.site-content-admin>p{max-width:75ch}.site-content-admin> .form-row label{display:block;font-size:16px}.site-content-admin select{display:block;width:100%;min-width:0;margin:8px 0 20px;padding:12px;border:1px solid var(--line);border-radius:4px;background:var(--cream);color:var(--green);font:inherit}.site-editor-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px;align-items:start}.site-editor-grid>*{min-width:0}.site-editor-preview{padding:24px;border:1px solid var(--line);border-radius:4px;background:#fffef8;overflow-wrap:anywhere}.site-editor-preview img{display:block;max-width:100%;max-height:420px;object-fit:contain;margin:16px auto}.site-editor-preview details{margin-top:24px}.site-editor-preview .preserve-lines{white-space:pre-wrap}.site-content-admin textarea{width:100%}@media(max-width:760px){.site-editor-grid{grid-template-columns:minmax(0,1fr)}}

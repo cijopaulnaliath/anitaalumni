@@ -1,4 +1,5 @@
 'use client';
+import {SiteText} from './site-content';
 import {useRef,useState} from 'react';
 import {Menu,X,ArrowUpRight} from 'lucide-react';
 import ProfileIndicator from './profile-indicator';
@@ -13,12 +14,12 @@ export function SiteFooter(){return <footer className="community-footer alumni-f
  <div className="footer-main">
   <div className="footer-identity">
    <a href="/" className="footer-brand" aria-label="Anita Alumni home"><span className="footer-emblem" aria-hidden="true"><img src="/alumni-logo.png" alt="" width="1254" height="1254"/></span><span>Anita Alumni<small>LOVE AND SERVE</small></span></a>
-   <p>One school.<br/>A lifetime of connection.</p>
+   <p><SiteText id="site-shell.text.1">One school.<br/>A lifetime of connection.</SiteText></p>
    <span className="footer-location">Anita Vidyalaya HSS<br/>Thannipuzha · Kalady · Kerala</span>
    <a href="/register" className="footer-register">Become a member <ArrowUpRight size={17} aria-hidden="true"/></a>
   </div>
   {footerGroups.map(group=><nav className="footer-link-group" key={group.title} aria-label={group.title+' footer links'}><h2>{group.title}</h2><ul>{group.links.map(([label,url])=><li key={url}><a href={url} target={url.startsWith('https://')?'_blank':undefined} rel={url.startsWith('https://')?'noopener noreferrer':undefined}>{label}</a></li>)}</ul></nav>)}
  </div>
  <div className="footer-bottom"><p>© {new Date().getFullYear()} Anita Alumni. All rights reserved.</p><nav aria-label="Legal and administration"><a href="/terms">Terms of use</a><a href="/privacy">Privacy</a><a href="/payment-terms">Payment terms</a><a href="/admin">Administration</a></nav></div>
- <p className="footer-governance">Proposed alumni-led association. School endorsement and formal governance are pending.</p>
+ <p className="footer-governance"><SiteText id="site-shell.text.2">Proposed alumni-led association. School endorsement and formal governance are pending.</SiteText></p>
  </footer>}
