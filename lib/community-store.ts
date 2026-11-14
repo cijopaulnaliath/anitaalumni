@@ -1,6 +1,6 @@
 import type {Content} from '@/lib/community-types';
 async function call(path:string,init:RequestInit={}){const url=process.env.SUPABASE_URL,key=process.env.SUPABASE_SERVICE_ROLE_KEY;if(!url||!key)throw Error('Storage unavailable');const r=await fetch(url.replace(/\/$/,'')+'/rest/v1/'+path,{...init,cache:'no-store',headers:{apikey:key,Authorization:'Bearer '+key,'Content-Type':'application/json',...init.headers}});if(!r.ok)throw Error('Storage request failed');return r;}
-export async function listContent(kind:string,admin=false){return await(await call('community_content?select=*&kind=eq.'+encodeURIComponent(kind)+(admin?'':'&status=eq.published')+'&order=created.desc')).json() as Content[];}
+export async function listContent(kind:string,admin=false){const items=await(await call('community_content?select=*&kind=eq.'+encodeURIComponent(kind)+(admin?'':'&status=eq.published')+'&order=created.desc')).json() as Content[];if(kind!=='leader'||admin||!items.some(c=>c.owner_id))return items;const members=await(await call('members?select=id,name,year&archived_at=is.null&is_test=eq.0&verification=eq.approved&email_verified_at=not.is.null&enrollment=eq.alumni')).json() as {id:string;name:string;year:number}[];return items.filter(c=>!c.owner_id||members.some(m=>m.id===c.owner_id&&m.name===c.title&&m.year===c.year));}
 export async function getContent(id:string){return(await(await call('community_content?select=*&id=eq.'+encodeURIComponent(id))).json() as Content[])[0]||null;}
 export async function saveContent(c:Content){await call('community_content?on_conflict=id',{method:'POST',headers:{Prefer:'resolution=merge-duplicates'},body:JSON.stringify(c)});}
 export async function moderateContent(id:string,status:string){await call('community_content?id=eq.'+encodeURIComponent(id),{method:'PATCH',body:JSON.stringify({status,updated:new Date().toISOString()})});}
@@ -12,3 +12,6 @@ export async function messageLimited(email:string){const a=await(await call('mes
 export async function readMessage(id:string){await call('messages?id=eq.'+encodeURIComponent(id),{method:'PATCH',body:JSON.stringify({status:'read'})});}
 
 export async function findRegistration(id:string){return(await(await call('members?select=id,email_verified_at,is_test,archived_at&id=eq.'+encodeURIComponent(id))).json() as {id:string;email_verified_at:string|null;is_test:number;archived_at:string|null}[])[0]||null;}
+
+export type LeaderCandidate={id:string;name:string;year:number;bio:string;photo:string|null;verification:string;enrollment:string;email_verified_at:string|null;is_test:number;archived_at:string|null};
+export async function findLeaderCandidate(id:string){return(await(await call('members?select=id,name,year,bio,photo,verification,enrollment,email_verified_at,is_test,archived_at&id=eq.'+encodeURIComponent(id))).json() as LeaderCandidate[])[0]||null;}

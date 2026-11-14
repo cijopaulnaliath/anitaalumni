@@ -351,3 +351,6 @@ dialog{max-height:calc(100vh - 32px);max-height:calc(100dvh - 32px);max-height:c
 @media(max-width:1100px){.member-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:760px){.member-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.member-info h3{font-size:24px}}
 @media(max-width:600px){.member-grid{grid-template-columns:minmax(0,1fr);gap:20px}.member-photo{height:300px}.member-info{padding:20px}.member-info h3{font-size:27px}.member-info p,.member-info small{font-size:16px}}
+
+.batch-leader-controls{margin-top:24px;padding-top:20px;border-top:1px solid var(--line)}
+.batch-leader-controls h3{font-size:22px;margin:0 0 12px}.batch-leader-controls p{max-width:65ch}

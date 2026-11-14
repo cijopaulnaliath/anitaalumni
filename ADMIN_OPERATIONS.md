@@ -29,3 +29,9 @@ Each successful live registration sends a separate notification to every valid, 
 Requires existing Resend configuration. Changing ADMIN_EMAILS requires redeployment. No database migration is needed. Provider acceptance and failures are recorded in the administration audit log as notification.contact.* or notification.registration.*. A provider-accepted email is not proof of inbox delivery; check Resend delivery/bounce logs. Notifications use idempotency keys; no automatic retry or historical backfill is scheduled. Contact enquiries and registrations remain saved if notification sending fails.
 
 Regression check: node tests/association-notifications.cjs. Tests use mocked email requests and fictional records; they send no real email.
+
+## Appoint a registered member as batch leader
+
+Open Administration → Registrations. After school approval and live email verification, use **Make batch leader** on an alumni network registration. Confirm the member agreed to the role and permitted publication of their name, batch, biography, and portrait. The existing Batch leaders page publishes the appointment with `/contact` as the contact option; private phone and email are not copied into the listing. This community role grants no administrator privileges.
+
+Use **Update batch leader listing** after changes to the profile or batch (with renewed publication confirmation), or **Remove batch leader appointment** to unpublish the appointment. Reappointing reuses the linked content entry. These actions are audited. Removed, test, event-only, unverified, and unapproved registrations cannot be appointed. Public linked listings are suppressed for inactive/unapproved members or when the saved name/batch no longer matches the profile. Existing manually created leadership entries remain managed in Pages & content. No database migration is required.
