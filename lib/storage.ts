@@ -1,10 +1,11 @@
+import {compareMemberNames} from './member-order';
 import {emailRpc} from '@/lib/supabase-rpc';
 // Server-only Vercel adapter. Never expose the service role key to the browser.
 const columns='id,name,year,level,city,country,profession,bio,interests,photo,visible';
 function config(){const url=process.env.SUPABASE_URL,key=process.env.SUPABASE_SERVICE_ROLE_KEY;if(!url||!key)throw Error('Supabase environment variables are missing');return{url:url.replace(/\/$/,''),key};}
 async function call(path:string,init:RequestInit={}){const {url,key}=config();const r=await fetch(url+path,{...init,cache:'no-store',headers:{apikey:key,Authorization:`Bearer ${key}`,...init.headers}});if(!r.ok)throw Error(await r.text());return r;}
 async function rows(query:string){return await(await call('/rest/v1/members?'+query)).json() as Record<string,unknown>[];}
-export async function allMembers(){return rows('select='+columns+'&archived_at=is.null&is_test=eq.0&visible=eq.1&verification=eq.approved&email_verified_at=not.is.null&order=created.desc');}
+export async function allMembers(){return (await rows('select='+columns+'&archived_at=is.null&is_test=eq.0&visible=eq.1&verification=eq.approved&email_verified_at=not.is.null&order=name.asc,id.asc')).sort((a,b)=>compareMemberNames({name:String(a.name||''),id:String(a.id||'')},{name:String(b.name||''),id:String(b.id||'')}));}
 export async function ownMember(hash:string){return (await rows('select='+columns+',token_expires_at,is_test,email_updates_opt_in,whatsapp_updates_opt_in,whatsapp_consent_at,fee_commitment_at,email,phone,participation,enrollment,email_verified_at,verification,verification_note&archived_at=is.null&token_hash=eq.'+encodeURIComponent(hash)+'&or=(token_expires_at.is.null,token_expires_at.gt.'+Date.now()+')'))[0]||null;}
 export async function addMember(m:Record<string,unknown>,proof:{id:string;session:string}){return emailRpc<boolean>('register_alumni_verified_member',{payload:m,challenge_id:proof.id,session_value:proof.session,now_value:Date.now()});}
 
