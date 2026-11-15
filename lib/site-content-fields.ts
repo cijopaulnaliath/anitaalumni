@@ -291,7 +291,7 @@ export const siteContentFields=[
     "key": "alumni-directory.text.3",
     "group": "Find alumni",
     "label": "P: Reconnect by name, batch, location, or profession. Only associati",
-    "defaultValue": "Reconnect by name, batch, location, or profession. Only association-approved alumni who choose to be listed appear here.",
+    "defaultValue": "Reconnect by name, batch, location, or profession. All active, association-approved alumni with verified email appear here.",
     "kind": "text"
   },
   {
