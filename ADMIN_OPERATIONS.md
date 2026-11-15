@@ -59,3 +59,9 @@ Impact reports are administrator-only. Enter an initiative, milestone, completed
 These features reuse private durable records in the existing `site_settings` table (`communityhub.post.*` and `communityhub.impact`) and existing photo storage, requiring no SQL migration or additional credentials. The impact register supports up to 1,000 reports, and post lists are bounded by the existing 10,000-record store limit. No bulk messages are sent when content is published.
 
 Validation: `npm run build`, `node tests/community-hub.cjs`, and the existing network, storage, content-editor, and batch-leader regression checks. Tests use fictional data and mocked persistence. Live checks cover public routes and anonymous access rejection; authenticated submissions and physical-device photo handling still require association acceptance testing.
+
+## Approved but absent from the public directory
+
+School approval does not change the member’s optional directory-listing choice. Registrations and Manage members now display **Public directory: Listed / Hidden** and the blocking reason. A real, active alumni profile must have school approval, a verified email, and `visible=1` to appear. Event-only, test, removed, unverified and unapproved profiles remain private. The approval success message reports the listing outcome rather than implying publication.
+
+If the reason is missing public-listing opt-in, the member must open My account, enable **Show my approved profile and photograph in the public directory**, and save. Admin review does not override this choice. Directory counts include only eligible public profiles, not every approved registration. Both public directory views refresh their results when their browser tab becomes visible or regains focus; filters remain selected. Tests: `node tests/directory-status.cjs` and `node tests/batch-leader.cjs`.

@@ -4,14 +4,14 @@ export async function listContent(kind:string,admin=false){const items=await(awa
 export async function getContent(id:string){return(await(await call('community_content?select=*&id=eq.'+encodeURIComponent(id))).json() as Content[])[0]||null;}
 export async function saveContent(c:Content){await call('community_content?on_conflict=id',{method:'POST',headers:{Prefer:'resolution=merge-duplicates'},body:JSON.stringify(c)});}
 export async function moderateContent(id:string,status:string){await call('community_content?id=eq.'+encodeURIComponent(id),{method:'PATCH',body:JSON.stringify({status,updated:new Date().toISOString()})});}
-export async function pendingMembers(){return await(await call('members?select=id,name,email,phone,year,level,country,city,verification,verification_note,enrollment,email_verified_at,created&archived_at=is.null&is_test=eq.0&order=created.desc&limit=200')).json();}
+export async function pendingMembers(){return await(await call('members?select=id,name,email,phone,year,level,country,city,verification,verification_note,enrollment,email_verified_at,visible,created&archived_at=is.null&is_test=eq.0&order=created.desc&limit=200')).json();}
 export async function reviewMember(id:string,status:string,actor:string){await call('members?id=eq.'+encodeURIComponent(id),{method:'PATCH',body:JSON.stringify({verification:status,reviewed_by:actor,reviewed_at:new Date().toISOString()})});}
 export async function recentMessages(){return await(await call('messages?select=*&order=created.desc&limit=100')).json();}
 export async function addMessage(m:Record<string,string>){await call('messages',{method:'POST',body:JSON.stringify({...m,status:'new'})});}
 export async function messageLimited(email:string){const a=await(await call('messages?select=id&email=eq.'+encodeURIComponent(email)+'&created=gt.'+encodeURIComponent(new Date(Date.now()-3600000).toISOString()))).json() as unknown[];return a.length>=3;}
 export async function readMessage(id:string){await call('messages?id=eq.'+encodeURIComponent(id),{method:'PATCH',body:JSON.stringify({status:'read'})});}
 
-export async function findRegistration(id:string){return(await(await call('members?select=id,email_verified_at,is_test,archived_at&id=eq.'+encodeURIComponent(id))).json() as {id:string;email_verified_at:string|null;is_test:number;archived_at:string|null}[])[0]||null;}
+export async function findRegistration(id:string){return(await(await call('members?select=id,email_verified_at,is_test,archived_at,visible,enrollment&id=eq.'+encodeURIComponent(id))).json() as {id:string;email_verified_at:string|null;is_test:number;archived_at:string|null;visible:number;enrollment:string}[])[0]||null;}
 
 export type LeaderCandidate={id:string;name:string;year:number;bio:string;photo:string|null;verification:string;enrollment:string;email_verified_at:string|null;is_test:number;archived_at:string|null};
 export async function findLeaderCandidate(id:string){return(await(await call('members?select=id,name,year,bio,photo,verification,enrollment,email_verified_at,is_test,archived_at&id=eq.'+encodeURIComponent(id))).json() as LeaderCandidate[])[0]||null;}
