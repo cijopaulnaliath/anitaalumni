@@ -13,7 +13,7 @@ export async function readMessage(id:string){await call('messages?id=eq.'+encode
 
 export async function findRegistration(id:string){return(await(await call('members?select=id,email_verified_at,is_test,archived_at,visible,enrollment&id=eq.'+encodeURIComponent(id))).json() as {id:string;email_verified_at:string|null;is_test:number;archived_at:string|null;visible:number;enrollment:string}[])[0]||null;}
 
-export type LeaderCandidate={id:string;name:string;year:number;bio:string;photo:string|null;verification:string;enrollment:string;email_verified_at:string|null;is_test:number;archived_at:string|null};
-export async function findLeaderCandidate(id:string){return(await(await call('members?select=id,name,year,bio,photo,verification,enrollment,email_verified_at,is_test,archived_at&id=eq.'+encodeURIComponent(id))).json() as LeaderCandidate[])[0]||null;}
+export type LeaderCandidate={id:string;name:string;email:string;year:number;bio:string;photo:string|null;verification:string;enrollment:string;email_verified_at:string|null;is_test:number;archived_at:string|null};
+export async function findLeaderCandidate(id:string){return(await(await call('members?select=id,name,email,year,bio,photo,verification,enrollment,email_verified_at,is_test,archived_at&id=eq.'+encodeURIComponent(id))).json() as LeaderCandidate[])[0]||null;}
 
 export async function siteContentRows(){return await(await call('community_content?select=id,title,details,image,updated&kind=eq.update&role=eq.site_text')).json() as Content[];}
