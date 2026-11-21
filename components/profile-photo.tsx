@@ -5,7 +5,7 @@ import {validatePhotoSelection} from '@/lib/photo-selection';
 export default function ProfilePhoto({id,hasPhoto,onChanged}:{id:string;hasPhoto:boolean;onChanged:()=>Promise<void>}){
  const input=useRef<HTMLInputElement>(null);
  const pending=useRef(false);
- const[operation,setOperation]=useState<'upload'|'remove'|null>(null),[error,setError]=useState(''),[message,setMessage]=useState(''),[version,setVersion]=useState(0);
+ const[operation,setOperation]=useState<'upload'|'remove'|null>(null),[error,setError]=useState(''),[message,setMessage]=useState(''),[version,setVersion]=useState('0');
  const busy=operation!==null;
  async function change(file?:File){
   if(!file||pending.current)return;
@@ -14,14 +14,15 @@ export default function ProfilePhoto({id,hasPhoto,onChanged}:{id:string;hasPhoto
    await validatePhotoSelection(file);
    const data=new FormData();data.set('photo',file);
    const r=await fetch('/api/members/photo',{method:'PUT',body:data});
-   const result=await r.json() as {error?:string};
+   const result=await r.json() as {error?:string;version?:string};
    if(!r.ok)throw Error(result.error||'Unable to upload your photo.');
-   const nextVersion=Date.now();
-   await onChanged();
+   const nextVersion=result.version||String(Date.now());
    // Keep both actions locked until the saved image is downloaded and displayable.
    const savedPhoto=new Image();savedPhoto.src='/api/photo/'+id+'?v='+nextVersion;
    try{await savedPhoto.decode()}catch{throw Error('Your photo was saved, but the preview could not be loaded. Please refresh or try replacing it again.')}
-   setVersion(nextVersion);setMessage('Your profile photo has been saved.');
+   setVersion(nextVersion);
+   await onChanged();
+   setMessage('Your profile photo has been saved.');
   }catch(e){setError((e as Error).message||'Unable to upload your photo.')}
   finally{pending.current=false;setOperation(null);if(input.current)input.current.value=''}
  }
