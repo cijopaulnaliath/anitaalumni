@@ -13,7 +13,7 @@ export default function RegistrationPhoto({active,onChange,onBusyChange}:Props){
  function closeCamera(){request.current++;stopCamera(stream.current);stream.current=null;if(video.current)video.current.srcObject=null;setCameraOpen(false);setCameraReady(false)}
  useEffect(()=>{if(!active){request.current++;stopCamera(stream.current);stream.current=null;if(video.current)video.current.srcObject=null;setCameraOpen(false);setCameraReady(false)}},[active]);
  useEffect(()=>()=>{request.current++;selection.current++;stopCamera(stream.current)},[]);
- async function choose(next:File){const id=++selection.current;setBusy(true);setError('');try{await validatePhotoSelection(next);if(id!==selection.current)return;setFile(next);onChange(next)}catch(e){if(id===selection.current)setError((e as Error).message)}finally{if(id===selection.current)setBusy(false)}}
+ async function choose(next:File){const id=++selection.current;setBusy(true);setError('');try{await validatePhotoSelection(next);if(id!==selection.current)return;setFile(next);onChange(next)}catch(e){if(id===selection.current){setFile(null);onChange(null);setError((e as Error).message)}}finally{if(id===selection.current)setBusy(false)}}
  function fromInput(input:HTMLInputElement){const next=input.files?.[0];input.value='';if(next)void choose(next)}
  async function openCamera(){setError('');if(/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1)){capture.current?.click();return}
   if(!navigator.mediaDevices?.getUserMedia){setError('This browser cannot open a camera. Choose Upload from device instead.');return}

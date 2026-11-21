@@ -20,3 +20,5 @@ export async function readStoredImage(key:string){const r=await call('/storage/v
 export async function emailExists(email:string){return emailRpc<boolean>('alumni_email_exists',{email_value:email.trim().toLowerCase()});}
 
 export async function registrationKind(email:string){const m=(await rows('select=is_test,archived_at&email=eq.'+encodeURIComponent(email)))[0];return !m?'missing':m.archived_at?'removed':m.is_test===1?'test':'live';}
+
+export async function directoryFilters(){const members=await rows('select=year,city,country&archived_at=is.null&is_test=eq.0&verification=eq.approved&email_verified_at=not.is.null&enrollment=eq.alumni');return{total:members.length,countries:[...new Set(members.map(m=>String(m.country||'')).filter(Boolean))].sort(),locations:[...new Set(members.map(m=>[m.city,m.country].filter(Boolean).join(', ')).filter(Boolean))].sort()};}

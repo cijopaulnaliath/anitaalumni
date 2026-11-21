@@ -1,3 +1,5 @@
+import {directorySearch,hasDirectorySearch,matchesDirectorySearch} from '@/lib/directory-search';
+import {directoryFilters} from '@/lib/storage';
 import {notifyRegistration} from '@/lib/association-notifications';
 import {sendWelcome} from '@/lib/welcome-email';
 import { allMembers,ownMember,addMember,removeMember,putPhoto,deletePhoto,emailExists } from '@/lib/storage';
@@ -10,7 +12,7 @@ const json=(v:unknown,status=200)=>Response.json(v,{status,headers:{'Cache-Contr
 async function hash(s:string){return Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s)))).map(x=>x.toString(16).padStart(2,'0')).join('');}
 function token(r:Request){return r.headers.get('cookie')?.match(/(?:^|;\s*)anita_member=([^;]+)/)?.[1]||'';}
 function sameOrigin(r:Request){const origin=r.headers.get('origin');return !origin||origin===new URL(r.url).origin;}
-export async function GET(r:Request){try{if(new URL(r.url).searchParams.has('me'))return json({member:token(r)?await ownMember(await hash(token(r))):null});return json({members:await allMembers()});}catch{return json({error:'The directory is temporarily unavailable. Please try again.'},503);}}
+export async function GET(r:Request){try{if(new URL(r.url).searchParams.has('me'))return json({member:token(r)?await ownMember(await hash(token(r))):null});const search=directorySearch(new URL(r.url).searchParams);if(!hasDirectorySearch(search))return json({members:[],searchRequired:true,...await directoryFilters()});const matches=(await allMembers()).filter(m=>matchesDirectorySearch(m,search));return json({members:matches.slice(0,200),total:matches.length,hasMore:matches.length>200,searchRequired:false});}catch{return json({error:'The directory is temporarily unavailable. Please try again.'},503);}}
 export async function POST(r:Request){
  if(!sameOrigin(r))return json({error:'Please submit from this website.'},403);
  if(Number(r.headers.get('content-length')||0)>4*1024*1024)return json({error:'Please choose a photo under 3 MB.'},413);
