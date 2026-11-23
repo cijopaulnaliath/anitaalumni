@@ -1,3 +1,4 @@
+import {after} from 'next/server';
 import {directorySearch,hasDirectorySearch,matchesDirectorySearch} from '@/lib/directory-search';
 import {directoryFilters} from '@/lib/storage';
 import {notifyRegistration} from '@/lib/association-notifications';
@@ -16,7 +17,7 @@ export async function GET(r:Request){try{if(new URL(r.url).searchParams.has('me'
 export async function POST(r:Request){
  if(!sameOrigin(r))return json({error:'Please submit from this website.'},403);
  if(Number(r.headers.get('content-length')||0)>4*1024*1024)return json({error:'Please choose a photo under 3 MB.'},413);
- let photoKey='';try{
+ let photoKey='',registrationSaved=false;try{
  const f=await r.formData();const get=(k:string,max:number)=>String(f.get(k)||'').trim().slice(0,max);
  const phone=normalizePhone(get('phone',40)),country=get('country',100),enrollment=get('enrollment',10);
  const participation=f.getAll('participation').map(String).filter(x=>(participationOptions as readonly string[]).includes(x));
@@ -39,8 +40,11 @@ export async function POST(r:Request){
  const interests=f.getAll('interests').map(String).filter(x=>['Mentoring','Community service','School on Wheels','Reunions','School support','Alumni work opportunities'].includes(x));
  const saved=await addMember({id,name,email,whatsappUpdates:f.get('whatsappUpdates')==='yes'?1:0,whatsappConsentAt:f.get('whatsappUpdates')==='yes'?new Date().toISOString():null,feeCommitmentAt:enrollment==='alumni'?new Date().toISOString():null,emailUpdates:f.get('emailUpdates')==='yes'?1:0,verificationNote:get('verificationNote',400),phone,country,participation:JSON.stringify(participation),enrollment,year,level,city,profession,bio,interests:JSON.stringify(interests),photo:photoKey||null,visible:enrollment==='alumni'?1:0,tokenHash:await hash(secret),created:new Date().toISOString()},{id:proofId,session});
  if(!saved){if(photoKey)await deletePhoto(photoKey);return json({error:'Email verification expired or does not match this registration. Go back and verify your email again.'},400);}
- const [welcomeStatus,adminNotificationStatus]=await Promise.all([sendWelcome(id,new URL(r.url).origin).catch(()=> 'pending'),notifyRegistration({id,name,email,year,level,city,country,isTest:testingRegistration}).catch(()=> 'unknown')]);
+ registrationSaved=true;
+ const origin=new URL(r.url).origin;
+ after(async()=>{await Promise.all([sendWelcome(id,origin).catch(()=> 'pending'),notifyRegistration({id,name,email,year,level,city,country,isTest:testingRegistration}).catch(()=> 'unknown')]);});
+ const welcomeStatus=testingRegistration?'test':'pending',adminNotificationStatus='pending';
  return new Response(JSON.stringify({ok:true,id,welcomeStatus,adminNotificationStatus}),{status:201,headers:{'Content-Type':'application/json','Cache-Control':'no-store','Set-Cookie':`anita_member=${secret}; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=2592000`}});
- }catch(e){if(photoKey)await deletePhoto(photoKey).catch(()=>{});if(/unique|duplicate|23505/i.test(String(e)))return json({error:duplicateEmailMessage,code:'EMAIL_EXISTS',field:'email'},409);return json({error:'We could not save your registration. Please try again.'},400);}
+ }catch(e){if(photoKey&&!registrationSaved)await deletePhoto(photoKey).catch(()=>{});if(/unique|duplicate|23505/i.test(String(e)))return json({error:duplicateEmailMessage,code:'EMAIL_EXISTS',field:'email'},409);return json({error:'We could not save your registration. Please try again.'},400);}
 }
 export async function DELETE(r:Request){if(!sameOrigin(r))return json({error:'Invalid request.'},403);if(!token(r)||!await ownMember(await hash(token(r))))return json({error:'Sign in to manage your profile.'},401);await removeMember(await hash(token(r)));return new Response(JSON.stringify({ok:true}),{headers:{'Content-Type':'application/json','Set-Cookie':'anita_member=; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=0'}});}
