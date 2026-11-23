@@ -1,3 +1,4 @@
+import {phoneColumns} from './phone-store';
 import {emailRpc} from '@/lib/supabase-rpc';
 import type {AdminMember,Budget,Ledger,Campaign,Recipient,PasswordRecord} from '@/lib/admin-types';
 import type {Payment} from '@/lib/payment-types';
@@ -13,7 +14,7 @@ export async function session(hash:string){return(await call<{username:string}[]
 export async function revokeSession(hash:string){await call('admin_sessions?token_hash=eq.'+encodeURIComponent(hash),{method:'DELETE'});}
 export async function audit(actor:string,action:string,target:string,detail=''){await call('admin_audit',post({id:crypto.randomUUID(),actor,action,target,detail:detail.slice(0,1000),created:new Date().toISOString()}));}
 export async function auditRows(){return call<Record<string,string>[]>('admin_audit?select=*&order=created.desc&limit=300');}
-export async function memberRows(){return paged<AdminMember>('members?select=id,name,email,phone,year,level,country,city,profession,verification,enrollment,visible,is_test,email_verified_at,email_updates_opt_in,whatsapp_updates_opt_in,whatsapp_consent_at,fee_commitment_at,archived_at,created&order=created.desc');}
+export async function memberRows(){return paged<AdminMember>('members?select=id,name,email,phone,year,level,country,city,profession,verification,enrollment,visible,is_test,email_verified_at,email_updates_opt_in,whatsapp_updates_opt_in,whatsapp_consent_at,fee_commitment_at,archived_at,created'+await phoneColumns()+'&order=created.desc');}
 export async function archiveMember(id:string,restore=false){return emailRpc<boolean>('alumni_archive_member',{member_value:id,restore_value:restore});}
 export async function financialRows(from:string,to:string,year:number){const [payments,ledger,budgets]=await Promise.all([paged<Payment>('payments?select=*&created=gte.'+encodeURIComponent(from)+'&created=lt.'+encodeURIComponent(to)+'&order=created.desc'),paged<Ledger>('ledger_entries?select=*&date=gte.'+from.slice(0,10)+'&date=lt.'+to.slice(0,10)+'&order=date.desc'),call<Budget[]>('budget_lines?select=*&year=eq.'+year+'&order=category')]);return{payments,ledger,budgets};}
 export async function saveBudget(b:Budget){await call('budget_lines?on_conflict=year,category',post(b,{Prefer:'resolution=merge-duplicates,return=minimal'}));}

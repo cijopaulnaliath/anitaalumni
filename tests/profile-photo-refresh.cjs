@@ -1,5 +1,5 @@
 const fs=require('fs'),ts=require('typescript'),assert=require('node:assert/strict');
-function load(path,deps){const m={exports:{}},code=ts.transpileModule(fs.readFileSync(path,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX,esModuleInterop:true}}).outputText;new Function('require','module','exports',code)(n=>n in deps?deps[n]:require(n),m,m.exports);return m.exports;}
+function load(path,deps){const m={exports:{}},code=ts.transpileModule(fs.readFileSync(path,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX,esModuleInterop:true}}).outputText;new Function('require','module','exports',code)(n=>n in deps?deps[n]:require("./helpers/email-only-dependencies.cjs")(n),m,m.exports);return m.exports;}
 (async()=>{
  const member={id:'example',photo:'members/example'},objects=new Map([[member.photo,'old']]);let failPointer=false;
  const route=load('app/api/members/photo/route.ts',{'@/lib/storage':{ownMember:async()=>({...member}),putPhoto:async(k,data)=>objects.set(k,data),setMemberPhoto:async(_,key)=>{if(failPointer)throw Error('Save failed');member.photo=key},deletePhoto:async k=>objects.delete(k)},'@/lib/payments':{digest:async v=>v,sameOrigin:()=>true,reply:(d,status=200)=>Response.json(d,{status})},'@/lib/profile-photo':{validatePhoto:async()=>({data:'new photo',type:'image/jpeg'})}});

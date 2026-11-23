@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "test": "node tests/run.cjs"
   },
   "dependencies": {
     "lucide-react": "^1.31.0",
@@ -17,6 +18,7 @@
     "sharp": "^0.35.5"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "0.5.17",
     "@tailwindcss/postcss": "4.2.1",
     "@types/node": "22.19.19",
     "@types/qrcode": "^1.5.6",
