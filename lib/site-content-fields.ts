@@ -1,5 +1,7 @@
+import {schoolContentFields} from './school-content';
 // Stable keys identify editable public content. Keep keys when changing defaults.
 export const siteContentFields=[
+  ...schoolContentFields,
   {
     "key": "alumni-home.text.1",
     "group": "Home",
