@@ -1,4 +1,4 @@
-export type NetworkMember={id:string;name:string;year:number;level:string;verification:string;enrollment:string;email_verified_at:string|null;is_test:number;archived_at:string|null;visible:number;email:string;phone:string;whatsapp_updates_opt_in:number;whatsapp_consent_at:string|null};
+export type NetworkMember={id:string;name:string;year:number;level:string;verification:string;enrollment:string;email_verified_at:string|null;phone_verified_at?:string|null;is_test:number;archived_at:string|null;visible:number;email:string;phone:string;whatsapp_updates_opt_in:number;whatsapp_consent_at:string|null};
 export type Connection={id:string;from:string;to:string;status:'pending'|'accepted'|'declined'|'withdrawn'|'blocked';created:string;updated:string;messages:{id:string;from:string;text:string;created:string}[]};
 export type Recommendation={id:string;memberId:string;memberName:string;year:number;leaderId:string;leaderName:string;note:string;created:string};
 export type Invitation={code:string;owner:string;year:number;created:string;expires:string};

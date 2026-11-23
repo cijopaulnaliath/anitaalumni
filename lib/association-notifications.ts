@@ -14,7 +14,7 @@ async function notify(kind:'contact'|'registration'|'batch-leader',id:string,rec
  }catch{await record(kind,id,'unknown',recipients.length);return 'unknown';}
 }
 export async function notifyContact(m:{id:string;name:string;email:string;subject:string;message:string}):Promise<Status>{try{return await notify('contact',m.id,[contactInbox],{subject:'Anita Alumni enquiry: '+m.subject.replace(/[\r\n]+/g,' ').slice(0,120),reply_to:m.email,text:['A new contact enquiry has been saved.','From: '+m.name,'Email: '+m.email,'Subject: '+m.subject,'Message:\n'+m.message,'View the private Contact inbox: '+site()+'/admin','Reference: '+m.id,'Reply to this email to respond directly to the enquirer.'].join('\n\n')});}catch{return 'unknown';}}
-export async function notifyRegistration(m:{id:string;name:string;email:string;year:number;level:string;city:string;country:string;isTest:boolean}):Promise<Status>{if(m.isTest)return 'skipped';try{return await notify('registration',m.id,administratorEmails(),{subject:'New Anita Alumni registration — Batch '+m.year,text:['A new email-verified registration is awaiting school/association review.','Name: '+m.name,'Batch: '+m.year,'Last class: '+m.level,'Location: '+[m.city,m.country].filter(Boolean).join(', '),'Email: '+m.email,'Review registrations: '+site()+'/admin','Registration reference: '+m.id,'This notification does not approve the member or confirm membership payment.'].join('\n\n')});}catch{return 'unknown';}}
+export async function notifyRegistration(m:{id:string;name:string;email:string;year:number;level:string;city:string;country:string;isTest:boolean;verificationMethod?:string}):Promise<Status>{if(m.isTest)return 'skipped';try{return await notify('registration',m.id,administratorEmails(),{subject:'New Anita Alumni registration — Batch '+m.year,text:[m.verificationMethod==='sms'?'A new phone-verified registration is awaiting school/association review.':'A new email-verified registration is awaiting school/association review.','Name: '+m.name,'Batch: '+m.year,'Last class: '+m.level,'Location: '+[m.city,m.country].filter(Boolean).join(', '),'Email: '+(m.email||'Not provided')+(m.verificationMethod==='sms'?' (not verified)':''),'Review registrations: '+site()+'/admin','Registration reference: '+m.id,'This notification does not approve the member or confirm membership payment.'].join('\n\n')});}catch{return 'unknown';}}
 
 function escapeHtml(value:string){return value.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]!));}
 export function batchLeaderLetter(name:string,year:number):Notification{
@@ -32,9 +32,9 @@ export function batchLeaderLetter(name:string,year:number):Notification{
  ];
  return{subject:'Your Batch Leader appointment — Class of '+year+' | Anita Alumni',reply_to:contactInbox,text:paragraphs.join('\n\n'),html:'<!doctype html><html><body style="margin:0;background:#f8f7f1;color:#173f35;font:16px/1.7 Arial,sans-serif"><div style="max-width:600px;margin:auto;padding:32px 24px"><p style="letter-spacing:2px;font-size:13px">ANITA ALUMNI · LOVE AND SERVE</p><h1 style="font:32px Georgia,serif">Your Batch Leader appointment</h1><p style="font-weight:bold">Class of '+year+'</p>'+paragraphs.map(p=>'<p>'+escapeHtml(p).replaceAll('\n','<br>')+'</p>').join('')+'<p><a href="'+workspace+'" style="display:inline-block;padding:14px 22px;background:#173f35;color:#fff;text-decoration:none;border-radius:4px">Open Batch Leader workspace</a></p></div></body></html>'};
 }
-export async function notifyBatchLeader(member:{id:string;name:string;email:string;year:number},appointmentId:string):Promise<Status>{
+export async function notifyBatchLeader(member:{id:string;name:string;email:string;email_verified_at?:string|null;year:number},appointmentId:string):Promise<Status>{
  try{
-  if(!/^[^\s@,]+@[^\s@,]+\.[^\s@,]+$/.test(member.email))return 'skipped';
+  if(!member.email_verified_at||!/^[^\s@,]+@[^\s@,]+\.[^\s@,]+$/.test(member.email))return 'skipped';
   return await notify('batch-leader',appointmentId,[member.email],batchLeaderLetter(member.name,member.year));
  }catch{return 'unknown';}
 }

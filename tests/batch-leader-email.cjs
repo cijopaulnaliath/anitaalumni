@@ -4,7 +4,7 @@ let ready=true;const events=[],calls=[];
 const deps={'./email-verification':{emailReady:()=>ready},'./payments':{digest:async s=>createHash('sha256').update(s).digest('hex')},'./admin-store':{audit:async(...args)=>events.push(args)}};
 new Function('require','module','exports',code)(n=>deps[n],m,m.exports);
 (async()=>{process.env.SITE_URL='https://anitaalumni.org';process.env.EMAIL_FROM='Anita Alumni <noreply@example.invalid>';process.env.RESEND_API_KEY='fixture';
- const member={id:'member',name:'Test <Leader>',email:'leader@example.invalid',year:1988};
+ const member={id:'member',name:'Test <Leader>',email:'leader@example.invalid',email_verified_at:'verified',year:1988};
  const letter=m.exports.batchLeaderLetter(member.name,member.year);assert(letter.subject.includes('1988'));assert(letter.text.includes('/batch-workspace'));assert(letter.text.includes('registered email'));assert(letter.html.includes('Test &lt;Leader&gt;'));assert(!letter.html.includes('Test <Leader>'));assert.equal(letter.reply_to,'anitavidyalaya.alumni@gmail.com');
  global.fetch=async(url,init)=>{calls.push({url,body:JSON.parse(init.body),key:init.headers['Idempotency-Key']});return Response.json({data:[{id:'provider-id'}]})};
  assert.equal(await m.exports.notifyBatchLeader(member,'appointment-1'),'sent');assert.deepEqual(calls[0].body[0].to,[member.email]);assert.equal(calls[0].body.length,1);assert(!calls[0].body[0].cc&&!calls[0].body[0].bcc);await m.exports.notifyBatchLeader(member,'appointment-1');assert.equal(calls[0].key,calls[1].key);await m.exports.notifyBatchLeader(member,'appointment-2');assert.notEqual(calls[1].key,calls[2].key);

@@ -1,5 +1,5 @@
 const fs=require('node:fs'),assert=require('node:assert/strict'),ts=require('typescript');
-function load(path,deps={}){const m={exports:{}},code=ts.transpileModule(fs.readFileSync(path,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;new Function('require','module','exports',code)(n=>n in deps?deps[n]:require(n),m,m.exports);return m.exports;}
+function load(path,deps={}){const m={exports:{}},code=ts.transpileModule(fs.readFileSync(path,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;new Function('require','module','exports',code)(n=>n in deps?deps[n]:require("./helpers/email-only-dependencies.cjs")(n),m,m.exports);return m.exports;}
 (async()=>{
  const {submitRegistration}=load('lib/registration-submit.ts');const payload=new FormData();payload.set('email','member@example.invalid');let calls=[];
  global.fetch=async(url,init)=>{calls.push({url,init});return Response.json({ok:true,id:'saved',welcomeStatus:'pending'},{status:201})};
